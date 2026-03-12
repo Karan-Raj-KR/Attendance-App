@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#137fec",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-display bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex flex-col">
+<!-- Top Navigation Header -->
+<header class="sticky top-0 z-10 bg-white/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 py-3">
+<div class="flex items-center justify-between max-w-xl mx-auto w-full">
+<div class="flex items-center gap-3">
+<div class="bg-primary/10 p-2 rounded-lg">
+<span class="material-symbols-outlined text-primary">school</span>
+</div>
+<h1 class="text-lg font-bold tracking-tight">Smart Attendance</h1>
+</div>
+<button class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="flex-1 w-full max-w-xl mx-auto p-4 pb-24">
+<!-- Greeting Section -->
+<section class="mb-8">
+<h2 class="text-2xl font-bold text-slate-900 dark:text-white">Welcome, Professor Miller</h2>
+<p class="text-slate-500 dark:text-slate-400 mt-1">Ready for your morning sessions?</p>
+</section>
+<!-- Quick Stats Row -->
+<div class="grid grid-cols-2 gap-4 mb-8">
+<div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm">
+<p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Today's Classes</p>
+<p class="text-2xl font-bold mt-1">4</p>
+</div>
+<div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm">
+<p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Total Students</p>
+<p class="text-2xl font-bold mt-1">182</p>
+</div>
+</div>
+<!-- Active Sections List -->
+<section class="space-y-4">
+<div class="flex items-center justify-between mb-2">
+<h3 class="text-lg font-bold">Your Active Sections</h3>
+<span class="text-xs font-semibold px-2 py-1 bg-primary/10 text-primary rounded-full uppercase tracking-wide">Live Now</span>
+</div>
+<!-- Card 1 -->
+<div class="relative group overflow-hidden rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm hover:shadow-md transition-shadow">
+<div class="absolute top-0 left-0 w-1 h-full bg-primary"></div>
+<div class="p-5">
+<div class="flex justify-between items-start mb-4">
+<div class="w-16 h-16 rounded-lg bg-gradient-to-br from-primary to-blue-400 flex items-center justify-center text-white shrink-0" data-alt="Abstract blue geometric pattern representing technology">
+<span class="material-symbols-outlined text-3xl">terminal</span>
+</div>
+<span class="text-xs font-medium bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">Section 1</span>
+</div>
+<div>
+<h4 class="text-xl font-bold mb-1">Advanced Algorithms</h4>
+<div class="space-y-2 mb-6">
+<div class="flex items-center text-slate-600 dark:text-slate-400 text-sm">
+<span class="material-symbols-outlined text-lg mr-2">group</span>
+                                45 Students Enrolled
+                            </div>
+<div class="flex items-center text-slate-600 dark:text-slate-400 text-sm">
+<span class="material-symbols-outlined text-lg mr-2">schedule</span>
+                                10:00 AM - 11:30 AM
+                            </div>
+</div>
+<button class="w-full bg-primary hover:bg-primary/90 text-white font-bold py-3 rounded-lg flex items-center justify-center gap-2 transition-all">
+<span class="material-symbols-outlined">how_to_reg</span>
+                            Take Attendance
+                        </button>
+</div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="relative group overflow-hidden rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm hover:shadow-md transition-shadow">
+<div class="absolute top-0 left-0 w-1 h-full bg-indigo-500"></div>
+<div class="p-5">
+<div class="flex justify-between items-start mb-4">
+<div class="w-16 h-16 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-400 flex items-center justify-center text-white shrink-0" data-alt="Abstract purple gradient representing data structures">
+<span class="material-symbols-outlined text-3xl">database</span>
+</div>
+<span class="text-xs font-medium bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">Section 4</span>
+</div>
+<div>
+<h4 class="text-xl font-bold mb-1">Database Systems</h4>
+<div class="space-y-2 mb-6">
+<div class="flex items-center text-slate-600 dark:text-slate-400 text-sm">
+<span class="material-symbols-outlined text-lg mr-2">group</span>
+                                38 Students Enrolled
+                            </div>
+<div class="flex items-center text-slate-600 dark:text-slate-400 text-sm">
+<span class="material-symbols-outlined text-lg mr-2">schedule</span>
+                                01:00 PM - 02:30 PM
+                            </div>
+</div>
+<button class="w-full bg-primary hover:bg-primary/90 text-white font-bold py-3 rounded-lg flex items-center justify-center gap-2 transition-all">
+<span class="material-symbols-outlined">how_to_reg</span>
+                            Take Attendance
+                        </button>
+</div>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="relative group overflow-hidden rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm hover:shadow-md transition-shadow">
+<div class="absolute top-0 left-0 w-1 h-full bg-emerald-500"></div>
+<div class="p-5">
+<div class="flex justify-between items-start mb-4">
+<div class="w-16 h-16 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-400 flex items-center justify-center text-white shrink-0" data-alt="Abstract green pattern representing software engineering">
+<span class="material-symbols-outlined text-3xl">developer_mode</span>
+</div>
+<span class="text-xs font-medium bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">Section 2</span>
+</div>
+<div>
+<h4 class="text-xl font-bold mb-1">Software Engineering</h4>
+<div class="space-y-2 mb-6">
+<div class="flex items-center text-slate-600 dark:text-slate-400 text-sm">
+<span class="material-symbols-outlined text-lg mr-2">group</span>
+                                52 Students Enrolled
+                            </div>
+<div class="flex items-center text-slate-600 dark:text-slate-400 text-sm">
+<span class="material-symbols-outlined text-lg mr-2">schedule</span>
+                                03:00 PM - 04:30 PM
+                            </div>
+</div>
+<button class="w-full bg-primary hover:bg-primary/90 text-white font-bold py-3 rounded-lg flex items-center justify-center gap-2 transition-all">
+<span class="material-symbols-outlined">how_to_reg</span>
+                            Take Attendance
+                        </button>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 px-2 pb-safe-area shadow-[0_-4px_10px_rgba(0,0,0,0.05)]">
+<div class="flex justify-around items-center h-16 max-w-xl mx-auto">
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined text-[24px]" style="font-variation-settings: 'FILL' 1">dashboard</span>
+<span class="text-[10px] font-bold">Dashboard</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-500 dark:text-slate-400" href="#">
+<span class="material-symbols-outlined text-[24px]">photo_camera</span>
+<span class="text-[10px] font-medium">Capture</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-500 dark:text-slate-400" href="#">
+<span class="material-symbols-outlined text-[24px]">history</span>
+<span class="text-[10px] font-medium">History</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-500 dark:text-slate-400" href="#">
+<span class="material-symbols-outlined text-[24px]">settings</span>
+<span class="text-[10px] font-medium">Settings</span>
+</a>
+</div>
+</nav>
+<style>
+        .pb-safe-area {
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+    </style>
+</body></html>

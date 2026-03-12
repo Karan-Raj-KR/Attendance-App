@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              colors: {
+                "primary": "#137fec",
+                "background-light": "#f6f7f8",
+                "background-dark": "#101922",
+              },
+              fontFamily: {
+                "display": ["Inter"]
+              },
+              borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+            },
+          },
+        }
+    </script>
+<title>Attendance Preview - Smart Classroom</title>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen">
+<div class="relative flex h-auto min-h-screen w-full max-w-md mx-auto flex-col bg-background-light dark:bg-background-dark shadow-xl overflow-x-hidden">
+<!-- Header -->
+<div class="flex items-center bg-white dark:bg-slate-900 p-4 border-b border-slate-200 dark:border-slate-800 justify-between sticky top-0 z-10">
+<div class="text-slate-900 dark:text-slate-100 flex size-10 items-center justify-center cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full">
+<span class="material-symbols-outlined">arrow_back</span>
+</div>
+<div class="flex flex-col items-center flex-1">
+<h2 class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight tracking-tight">Attendance Preview</h2>
+<p class="text-slate-500 dark:text-slate-400 text-xs font-medium">Class 10-A • Physics Lab</p>
+</div>
+<div class="flex w-10 items-center justify-end">
+<button class="flex items-center justify-center rounded-lg h-10 w-10 bg-primary/10 text-primary hover:bg-primary/20 transition-colors">
+<span class="material-symbols-outlined">check</span>
+</button>
+</div>
+</div>
+<!-- Camera Preview Area -->
+<div class="relative w-full aspect-[4/3] bg-slate-200 dark:bg-slate-800 overflow-hidden">
+<!-- Simulated Classroom Image -->
+<div class="absolute inset-0 bg-cover bg-center" data-alt="Modern classroom with students sitting at desks" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCJmekq-IjTb0Lsu_QkjYOP5p0zVRU3uMOBVQ0vkhZeHb3oqk4PwUiSb53fihJWMfybLWjKvWtN1Q5r0BymUjVPYImCeETg8bdLhuW44mpL7a80uFyYy9iizAKmfmUyyVyoreKplo4c7PpK2Z-oKPVQcklGM79GgV3kVCSAb_mtNioxBkPgGuWla2zHac5wnvnPhl6mumrl_kriXHHT6WWheIZiyhaWuWw392AdUxHNio7hxI15CC70aJuVIG87kBFyCJrzd9B28Cct');">
+<!-- Bounding Box 1: Confirmed -->
+<div class="absolute top-[25%] left-[20%] w-24 h-24 border-2 border-primary rounded-sm bg-primary/10">
+<div class="absolute -top-6 left-0 bg-primary text-white text-[10px] px-2 py-0.5 rounded-t-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]">verified</span>
+                        Marcus Thorne
+                    </div>
+</div>
+<!-- Bounding Box 2: Confirmed -->
+<div class="absolute top-[30%] left-[60%] w-20 h-20 border-2 border-primary rounded-sm bg-primary/10">
+<div class="absolute -top-6 left-0 bg-primary text-white text-[10px] px-2 py-0.5 rounded-t-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]">verified</span>
+                        Elena Rodriguez
+                    </div>
+</div>
+<!-- Bounding Box 3: Uncertain -->
+<div class="absolute top-[15%] left-[45%] w-18 h-18 border-2 border-yellow-500 rounded-sm bg-yellow-500/10">
+<div class="absolute -top-6 left-0 bg-yellow-500 text-white text-[10px] px-2 py-0.5 rounded-t-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]">help_outline</span>
+                        Unknown?
+                    </div>
+</div>
+<!-- Bounding Box 4: Confirmed -->
+<div class="absolute top-[45%] left-[10%] w-22 h-22 border-2 border-primary rounded-sm bg-primary/10">
+<div class="absolute -top-6 left-0 bg-primary text-white text-[10px] px-2 py-0.5 rounded-t-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]">verified</span>
+                        Sarah Chen
+                    </div>
+</div>
+<!-- Overlay Scan Effect -->
+<div class="absolute inset-0 bg-gradient-to-b from-transparent via-primary/5 to-transparent h-1/4 w-full animate-pulse top-1/2"></div>
+</div>
+<!-- Scan Indicators -->
+<div class="absolute bottom-4 left-4 right-4 flex justify-between items-end">
+<div class="bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/20 flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+<span class="text-white text-[10px] font-medium tracking-wider uppercase">Live Analysis</span>
+</div>
+<div class="flex flex-col items-end gap-1">
+<div class="text-white/80 text-[10px]">98% Confidence</div>
+<div class="w-24 h-1.5 bg-white/20 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[98%]"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Detection Statistics -->
+<div class="px-4 py-6">
+<h3 class="text-slate-900 dark:text-slate-100 text-xl font-bold leading-tight mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">analytics</span>
+                Detection Summary
+            </h3>
+<div class="grid grid-cols-2 gap-3 mb-6">
+<div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800">
+<p class="text-slate-500 dark:text-slate-400 text-xs font-medium uppercase mb-1">Students Found</p>
+<div class="flex items-baseline gap-1">
+<span class="text-2xl font-bold text-primary">24</span>
+<span class="text-slate-400 text-sm">/ 28</span>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800">
+<p class="text-slate-500 dark:text-slate-400 text-xs font-medium uppercase mb-1">Uncertain</p>
+<div class="flex items-baseline gap-1">
+<span class="text-2xl font-bold text-yellow-500">2</span>
+<span class="text-slate-400 text-sm">Alerts</span>
+</div>
+</div>
+</div>
+<h3 class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight mb-3">Recent Matches</h3>
+<div class="space-y-2">
+<!-- Match Row 1 -->
+<div class="flex items-center gap-3 bg-white dark:bg-slate-900 p-3 rounded-lg border border-slate-200 dark:border-slate-800">
+<div class="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-700 bg-cover bg-center overflow-hidden" data-alt="Student headshot Marcus Thorne" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAqTyl585VywuG809_rUg-zKQyRcIxjTNiOPHvQ0cRZewp9qLHdC_Ue8oDcj4hOpu9kxvzo0IAhtQAzvQ3yizOnAx90CL2hGdkiXYBGHql8M1soxZ4kLxbEKQe6TW2pKyShb6VohwVodsqF2OcmSlJq1lhvlF-Yv19EeVQVZKvuOLXI355yTwWDyPI-DZV_HfNbw_GlIrMQxCvFJixBMVFfUPCHcHgk4S2LAkuPsenh3bAubkz7pMaz_3m6rMfzkZ4N1HItr-7yAyqg');"></div>
+<div class="flex-1">
+<p class="text-sm font-bold">Marcus Thorne</p>
+<p class="text-[10px] text-slate-500">Confidence: 0.99</p>
+</div>
+<div class="text-green-500">
+<span class="material-symbols-outlined">verified</span>
+</div>
+</div>
+<!-- Match Row 2 -->
+<div class="flex items-center gap-3 bg-white dark:bg-slate-900 p-3 rounded-lg border border-slate-200 dark:border-slate-800">
+<div class="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-700 bg-cover bg-center overflow-hidden" data-alt="Student headshot Elena Rodriguez" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDCC5LRD8rggeIiW-lqNgjPDP9-nhXoHNFYKZ07mtbThSBkziR4EIqrqFFR0Nql5Z3piHydjpXfP7PCttscBiYYPQkUtH3qYq9K7fZiTz7bunUCrAP_oaSXpBlX1VKKUenodDsPHx6f88D0N_x16y7ASdpm6DAKiRghszbAt1Ua_bWjAOhvRxzprHV-aIUHDexwZeJejNDNYho_jN47vDriXJri0aPwslw0tPgtU8c27pgKodHIdo0H4Pj5RPbqtt2L5TjB-qBEF6qj');"></div>
+<div class="flex-1">
+<p class="text-sm font-bold">Elena Rodriguez</p>
+<p class="text-[10px] text-slate-500">Confidence: 0.96</p>
+</div>
+<div class="text-green-500">
+<span class="material-symbols-outlined">verified</span>
+</div>
+</div>
+<!-- Uncertain Row -->
+<div class="flex items-center gap-3 bg-yellow-50 dark:bg-yellow-900/10 p-3 rounded-lg border border-yellow-200 dark:border-yellow-900/30">
+<div class="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-yellow-600">
+<span class="material-symbols-outlined">person_search</span>
+</div>
+<div class="flex-1">
+<p class="text-sm font-bold text-yellow-700 dark:text-yellow-500">Partial Match - ID 890</p>
+<p class="text-[10px] text-yellow-600/70">Requires Manual Review</p>
+</div>
+<div class="text-yellow-500 flex gap-2">
+<button class="hover:bg-yellow-500/10 p-1 rounded"><span class="material-symbols-outlined text-sm">edit</span></button>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-auto pb-24"></div>
+<!-- Bottom Navigation Bar -->
+<div class="fixed bottom-0 left-0 right-0 max-w-md mx-auto z-20">
+<div class="flex gap-2 border-t border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm px-4 pb-6 pt-3">
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-slate-400 dark:text-slate-500" href="#">
+<div class="flex h-8 items-center justify-center">
+<span class="material-symbols-outlined">home</span>
+</div>
+<p class="text-[10px] font-semibold uppercase tracking-wider">Home</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-slate-400 dark:text-slate-500" href="#">
+<div class="flex h-8 items-center justify-center">
+<span class="material-symbols-outlined">history</span>
+</div>
+<p class="text-[10px] font-semibold uppercase tracking-wider">History</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-primary" href="#">
+<div class="flex h-8 items-center justify-center">
+<span class="material-symbols-outlined fill-1">camera</span>
+</div>
+<p class="text-[10px] font-semibold uppercase tracking-wider">Live Scan</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-slate-400 dark:text-slate-500" href="#">
+<div class="flex h-8 items-center justify-center">
+<span class="material-symbols-outlined">settings</span>
+</div>
+<p class="text-[10px] font-semibold uppercase tracking-wider">Settings</p>
+</a>
+</div>
+</div>
+</div>
+</body></html>

@@ -1,0 +1,111 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import StudentRow from '../components/StudentRow';
+
+export default function Review() {
+  const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Mock student data
+  const students = [
+    { id: '102945', name: 'David Chen', status: 'uncertain', avatar: 'https://api.dicebear.com/7.x/notionists/svg?seed=David' },
+    { id: '102938', name: 'Alex Johnson', status: 'present', avatar: 'https://api.dicebear.com/7.x/notionists/svg?seed=Alex' },
+    { id: '102952', name: 'Elena Rodriguez', status: 'present', avatar: 'https://api.dicebear.com/7.x/notionists/svg?seed=Elena' },
+    { id: '102960', name: 'Marcus Wright', status: 'present', avatar: 'https://api.dicebear.com/7.x/notionists/svg?seed=Marcus' },
+    { id: '102941', name: 'Sarah Miller', status: 'absent', avatar: 'https://api.dicebear.com/7.x/notionists/svg?seed=Sarah' },
+  ];
+
+  const filteredStudents = students.filter(student => 
+    student.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    student.id.includes(searchQuery)
+  );
+
+  return (
+    <div className="flex flex-col h-full w-full max-w-md mx-auto bg-white dark:bg-slate-900 shadow-xl overflow-hidden relative">
+      {/* Header */}
+      <header className="sticky top-0 z-20 flex items-center bg-white/90 dark:bg-slate-900/90 backdrop-blur-md px-4 py-4 border-b border-slate-100 dark:border-slate-800 justify-between w-full">
+        <div className="flex items-center gap-3">
+          <button 
+            onClick={() => navigate(-1)}
+            className="text-slate-900 dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 p-2 rounded-full transition-colors flex items-center justify-center -ml-2"
+          >
+            <span className="material-symbols-outlined">arrow_back</span>
+          </button>
+          <div>
+            <h2 className="text-lg font-bold leading-tight tracking-tight">Review Attendance</h2>
+            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Computer Science - Section A</p>
+          </div>
+        </div>
+        <button className="flex items-center justify-center p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-primary">
+          <span className="material-symbols-outlined">calendar_today</span>
+        </button>
+      </header>
+
+      {/* Attendance Overview */}
+      <div className="px-4 py-4 bg-primary/5 dark:bg-primary/10 border-b border-primary/10">
+        <div className="flex justify-between items-center mb-1">
+          <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Oct 25, 2023</h3>
+          <span className="text-xs font-bold text-primary">42 Students Total</span>
+        </div>
+        <div className="flex gap-4 mt-3">
+          <div className="flex flex-col">
+            <span className="text-2xl font-bold text-emerald-600">38</span>
+            <span className="text-[10px] font-bold uppercase text-slate-400">Present</span>
+          </div>
+          <div className="flex flex-col">
+            <span className="text-2xl font-bold text-rose-500">2</span>
+            <span className="text-[10px] font-bold uppercase text-slate-400">Absent</span>
+          </div>
+          <div className="flex flex-col">
+            <span className="text-2xl font-bold text-amber-500">2</span>
+            <span className="text-[10px] font-bold uppercase text-slate-400">Uncertain</span>
+          </div>
+        </div>
+      </div>
+
+      <main className="flex-1 overflow-y-auto pb-32">
+        {/* Search Bar */}
+        <div className="px-4 py-3 sticky top-0 bg-white dark:bg-slate-900 z-10">
+          <div className="relative">
+            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">search</span>
+            <input 
+              type="text" 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-lg py-2.5 pl-10 pr-4 text-sm focus:ring-2 focus:ring-primary/50 transition-all outline-none text-slate-900 dark:text-slate-100 placeholder-slate-500" 
+              placeholder="Search student name or ID..." 
+            />
+          </div>
+        </div>
+
+        {/* Student Cards */}
+        <div className="flex flex-col">
+          {filteredStudents.map(student => (
+            <StudentRow 
+              key={student.id} 
+              student={student} 
+              onEdit={() => console.log('Edit student', student.id)} 
+            />
+          ))}
+          
+          {filteredStudents.length === 0 && (
+             <div className="p-8 text-center text-slate-500">
+                No students found matching "{searchQuery}"
+             </div>
+          )}
+        </div>
+      </main>
+
+      {/* Sticky Bottom Action Button */}
+      <div className="fixed bottom-24 left-1/2 -translate-x-1/2 w-full max-w-md px-4 pb-4 bg-gradient-to-t from-white via-white to-transparent dark:from-slate-900 dark:via-slate-900 pt-8 z-30">
+        <button 
+          onClick={() => navigate('/export')}
+          className="w-full bg-primary text-white font-bold py-4 rounded-xl shadow-lg shadow-primary/30 flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
+        >
+          <span className="material-symbols-outlined">check_circle</span>
+          Confirm Attendance
+        </button>
+      </div>
+    </div>
+  );
+}

@@ -1,0 +1,47 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #137fec;
+  --color-background-light: #f6f7f8;
+  --color-background-dark: #101922;
+
+  --font-display: Inter, sans-serif;
+  
+  --radius: 0.25rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-full: 9999px;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-background-light);
+    color: var(--color-slate-900);
+    @apply font-display antialiased flex flex-col min-h-screen;
+    min-height: max(700px, 100dvh);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body {
+      background-color: var(--color-background-dark);
+      color: var(--color-slate-100);
+    }
+  }
+}
+
+@layer utilities {
+  .pb-safe-area {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .camera-overlay {
+    background: linear-gradient(0deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0) 20%, rgba(0,0,0,0) 80%, rgba(0,0,0,0.4) 100%);
+  }
+  .scan-line {
+    height: 2px;
+    background: #137fec;
+    box-shadow: 0 0 8px #137fec;
+    position: absolute;
+    width: 100%;
+    top: 50%;
+  }
+}
