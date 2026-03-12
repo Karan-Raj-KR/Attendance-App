@@ -13,18 +13,25 @@ export default function AppRoutes() {
   return (
     <Routes>
 
-      <Route index element={<Navigate to="/login" replace />} />
-
+      {/* login */}
       <Route path="/login" element={<Login />} />
 
+      {/* app layout routes */}
       <Route path="/" element={<AppLayout />}>
+
+        <Route index element={<Navigate to="/dashboard" replace />} />
+
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="capture" element={<Capture />} />
         <Route path="preview" element={<Preview />} />
         <Route path="review" element={<Review />} />
         <Route path="export" element={<Export />} />
         <Route path="attendance" element={<Attendance />} />
+
       </Route>
+
+      {/* fallback */}
+      <Route path="*" element={<Navigate to="/login" replace />} />
 
     </Routes>
   );

@@ -11,5 +11,8 @@
     "python.terminal.activateEnvironment": true,
     "python.analysis.diagnosticSeverityOverrides": {
         "reportMissingImports": "warning"
-    }
+    },
+    "css.lint.unknownAtRules": "ignore",
+    "less.lint.unknownAtRules": "ignore",
+    "scss.lint.unknownAtRules": "ignore"
 }
