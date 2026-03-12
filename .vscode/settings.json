@@ -1,0 +1,15 @@
+{
+    "python.defaultInterpreterPath": "${workspaceFolder}/backend/venv/bin/python",
+    "python.analysis.venvPath": "${workspaceFolder}/backend",
+    "python.analysis.venv": "venv",
+    "python.analysis.extraPaths": [
+        "${workspaceFolder}/backend"
+    ],
+    "python.analysis.autoImportCompletions": true,
+    "python.analysis.typeCheckingMode": "basic",
+    "python.languageServer": "Pylance",
+    "python.terminal.activateEnvironment": true,
+    "python.analysis.diagnosticSeverityOverrides": {
+        "reportMissingImports": "warning"
+    }
+}

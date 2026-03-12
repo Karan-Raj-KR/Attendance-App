@@ -38,7 +38,8 @@ class ModelLoader:
             name="buffalo_l",                # Includes both detection + recognition
             providers=["CPUExecutionProvider"]
         )
-        self._face_app.prepare(ctx_id=ctx_id, det_size=det_size)
+        if self._face_app is not None:
+            self._face_app.prepare(ctx_id=ctx_id, det_size=det_size)
         logger.info("Models loaded successfully.")
 
     @property

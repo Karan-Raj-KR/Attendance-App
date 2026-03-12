@@ -102,18 +102,17 @@ def get_embeddings_by_section(section_id: int) -> list[dict]:
 
 def create_attendance_session(
     section_id: int,
-    session_date: str,
     image_path: str = None,
-    total_detected: int = 0,
-    total_present: int = 0,
-    total_absent: int = 0
+    total_students: int = 0,
+    present_count: int = 0,
+    absent_count: int = 0
 ) -> int:
     conn = get_connection()
     cursor = conn.execute(
         """INSERT INTO attendance_sessions 
-           (section_id, session_date, image_path, total_detected, total_present, total_absent) 
-           VALUES (?, ?, ?, ?, ?, ?)""",
-        (section_id, session_date, image_path, total_detected, total_present, total_absent)
+           (section_id, image_path, total_students, present_count, absent_count) 
+           VALUES (?, ?, ?, ?, ?)""",
+        (section_id, image_path, total_students, present_count, absent_count)
     )
     conn.commit()
     session_id = cursor.lastrowid
@@ -136,15 +135,13 @@ def save_attendance_records(session_id: int, records: list[dict]):
     for record in records:
         conn.execute(
             """INSERT INTO attendance_records 
-               (session_id, student_id, status, confidence, bbox, manually_corrected)
-               VALUES (?, ?, ?, ?, ?, ?)""",
+               (session_id, student_id, status, confidence)
+               VALUES (?, ?, ?, ?)""",
             (
                 session_id,
                 record["student_id"],
                 record["status"],
                 record.get("confidence", 0.0),
-                json.dumps(record.get("bbox")) if record.get("bbox") else None,
-                1 if record.get("manually_corrected", False) else 0
             )
         )
     conn.commit()
@@ -154,7 +151,8 @@ def save_attendance_records(session_id: int, records: list[dict]):
 def get_attendance_records(session_id: int) -> list[dict]:
     conn = get_connection()
     rows = conn.execute("""
-        SELECT ar.*, s.student_id_number, s.name as student_name
+        SELECT ar.id, ar.session_id, ar.student_id, ar.status, ar.confidence, ar.timestamp,
+               s.student_id_number, s.name as student_name
         FROM attendance_records ar
         JOIN students s ON ar.student_id = s.id
         WHERE ar.session_id = ?
@@ -165,10 +163,33 @@ def get_attendance_records(session_id: int) -> list[dict]:
 
 
 def get_sessions_by_section(section_id: int) -> list[dict]:
+    """Get all sessions for a section, including section name."""
     conn = get_connection()
-    rows = conn.execute(
-        "SELECT * FROM attendance_sessions WHERE section_id = ? ORDER BY session_date DESC",
-        (section_id,)
-    ).fetchall()
+    rows = conn.execute("""
+        SELECT ats.id as session_id, sec.name as section, 
+               DATE(ats.created_at) as date,
+               ats.present_count as present, ats.absent_count as absent,
+               ats.total_students, ats.image_path, ats.created_at
+        FROM attendance_sessions ats
+        JOIN sections sec ON ats.section_id = sec.id
+        WHERE ats.section_id = ?
+        ORDER BY ats.created_at DESC
+    """, (section_id,)).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
+def get_all_sessions() -> list[dict]:
+    """Get all sessions across all sections."""
+    conn = get_connection()
+    rows = conn.execute("""
+        SELECT ats.id as session_id, sec.name as section,
+               DATE(ats.created_at) as date,
+               ats.present_count as present, ats.absent_count as absent,
+               ats.total_students, ats.image_path, ats.created_at
+        FROM attendance_sessions ats
+        JOIN sections sec ON ats.section_id = sec.id
+        ORDER BY ats.created_at DESC
+    """).fetchall()
     conn.close()
     return [dict(r) for r in rows]

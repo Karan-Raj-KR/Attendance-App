@@ -53,24 +53,21 @@ def init_db():
         CREATE TABLE IF NOT EXISTS attendance_sessions (
             id              INTEGER PRIMARY KEY AUTOINCREMENT,
             section_id      INTEGER NOT NULL,
-            session_date    DATE NOT NULL,
+            created_at      DATETIME DEFAULT CURRENT_TIMESTAMP,
             image_path      TEXT,
-            total_detected  INTEGER DEFAULT 0,
-            total_present   INTEGER DEFAULT 0,
-            total_absent    INTEGER DEFAULT 0,
-            created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            total_students  INTEGER DEFAULT 0,
+            present_count   INTEGER DEFAULT 0,
+            absent_count    INTEGER DEFAULT 0,
             FOREIGN KEY (section_id) REFERENCES sections(id)
         );
 
         CREATE TABLE IF NOT EXISTS attendance_records (
-            id                  INTEGER PRIMARY KEY AUTOINCREMENT,
-            session_id          INTEGER NOT NULL,
-            student_id          INTEGER NOT NULL,
-            status              TEXT NOT NULL DEFAULT 'absent',
-            confidence          REAL DEFAULT 0.0,
-            bbox                TEXT,
-            manually_corrected  INTEGER DEFAULT 0,
-            created_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            id              INTEGER PRIMARY KEY AUTOINCREMENT,
+            session_id      INTEGER NOT NULL,
+            student_id      INTEGER NOT NULL,
+            status          TEXT NOT NULL DEFAULT 'absent',
+            confidence      REAL DEFAULT 0.0,
+            timestamp       DATETIME DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (session_id) REFERENCES attendance_sessions(id) ON DELETE CASCADE,
             FOREIGN KEY (student_id) REFERENCES students(id)
         );

@@ -4,9 +4,7 @@ Attendance business logic: saving sessions, exporting reports.
 
 import csv
 import io
-import json
 import logging
-from datetime import date
 
 from app.database.queries import (
     create_attendance_session,
@@ -14,7 +12,9 @@ from app.database.queries import (
     get_attendance_session,
     get_attendance_records,
     get_sessions_by_section,
+    get_all_sessions,
     get_section,
+    get_students_by_section,
 )
 
 logger = logging.getLogger(__name__)
@@ -22,7 +22,6 @@ logger = logging.getLogger(__name__)
 
 def save_attendance(
     section_id: int,
-    session_date: str,
     image_path: str,
     records: list[dict]
 ) -> int:
@@ -30,20 +29,20 @@ def save_attendance(
     Save a confirmed attendance session with all records.
     Returns the session_id.
     """
-    total_present = sum(1 for r in records if r["status"] == "present")
-    total_absent = sum(1 for r in records if r["status"] == "absent")
+    present_count = sum(1 for r in records if r["status"] == "present")
+    absent_count = sum(1 for r in records if r["status"] == "absent")
+    total_students = len(records)
 
     session_id = create_attendance_session(
         section_id=section_id,
-        session_date=session_date,
         image_path=image_path,
-        total_detected=len(records),
-        total_present=total_present,
-        total_absent=total_absent,
+        total_students=total_students,
+        present_count=present_count,
+        absent_count=absent_count,
     )
 
     save_attendance_records(session_id, records)
-    logger.info(f"Saved attendance session {session_id}: {total_present} present, {total_absent} absent")
+    logger.info(f"Saved attendance session {session_id}: {present_count} present, {absent_count} absent")
     return session_id
 
 
@@ -65,13 +64,14 @@ def export_attendance_csv(session_id: int) -> str:
     writer.writerow(["Attendance Report"])
     writer.writerow(["Course", section["course_name"] if section else "Unknown"])
     writer.writerow(["Section", section["name"] if section else "Unknown"])
-    writer.writerow(["Date", session["session_date"]])
-    writer.writerow(["Total Present", session["total_present"]])
-    writer.writerow(["Total Absent", session["total_absent"]])
+    writer.writerow(["Date", session["created_at"]])
+    writer.writerow(["Total Students", session["total_students"]])
+    writer.writerow(["Present", session["present_count"]])
+    writer.writerow(["Absent", session["absent_count"]])
     writer.writerow([])
 
     # Data headers
-    writer.writerow(["Student ID", "Name", "Status", "Confidence", "Manually Corrected"])
+    writer.writerow(["Student ID", "Name", "Status", "Confidence"])
 
     for record in records:
         writer.writerow([
@@ -79,7 +79,6 @@ def export_attendance_csv(session_id: int) -> str:
             record.get("student_name", ""),
             record["status"],
             round(record.get("confidence", 0), 3),
-            "Yes" if record.get("manually_corrected") else "No"
         ])
 
     return output.getvalue()

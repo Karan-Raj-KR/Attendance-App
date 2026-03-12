@@ -7,7 +7,7 @@ export default function AppLayout() {
       <div className="flex-1 overflow-y-auto w-full relative">
         <Outlet />
       </div>
-      <Navbar />
+      {<Navbar />}
     </div>
   );
 }
