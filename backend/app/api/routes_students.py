@@ -27,6 +27,7 @@ from app.database.queries import (
 from app.services.face_detection import detect_faces
 from app.utils.image_utils import read_image_from_bytes
 from app.utils.embedding_utils import embedding_to_bytes
+from app.ml.faiss_index import faiss_manager
 
 logger = logging.getLogger(__name__)
 
@@ -55,23 +56,28 @@ async def list_sections():
     return [SectionResponse(**s) for s in sections]
 
 
-# ── Student Endpoints ────────────────────────────────────────────────────
+# ── Student Registration (Single Photo — Strict) ────────────────────────
 
 @router.post("/register")
 async def register_student(
     student_id_number: str = Form(...),
     name: str = Form(...),
     section_id: int = Form(...),
-    images: list[UploadFile] = File(..., description="1-5 face training images"),
+    image: UploadFile = File(..., description="Single face photo (JPEG/PNG)"),
 ):
     """
-    Register a new student with training images.
-    For each image, a face is detected, an embedding is generated, and stored.
-    """
-    if len(images) < 1 or len(images) > 5:
-        raise HTTPException(status_code=400, detail="Please provide 1 to 5 images")
+    Register a new student with a single face photo.
 
-    # Check if section exists
+    Steps:
+        1. Detect face in uploaded image
+        2. Generate embedding using InsightFace
+        3. Save student in database
+        4. Store embedding vector
+        5. Add embedding to FAISS index
+
+    Errors if 0 or 2+ faces are detected in the image.
+    """
+    # Validate section exists
     section = get_section(section_id)
     if not section:
         raise HTTPException(status_code=404, detail=f"Section {section_id} not found")
@@ -79,16 +85,107 @@ async def register_student(
     # Check for duplicate student ID
     existing = get_student_by_id_number(student_id_number)
     if existing:
-        raise HTTPException(status_code=409, detail=f"Student {student_id_number} already registered")
+        raise HTTPException(
+            status_code=409,
+            detail=f"Student {student_id_number} already registered",
+        )
 
-    # Create student record
+    # Read and validate the image
+    image_bytes = await image.read()
+    if not image_bytes:
+        raise HTTPException(status_code=400, detail="Empty image file")
+
+    try:
+        img_bgr = read_image_from_bytes(image_bytes)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid image format")
+
+    # Detect faces — enforce exactly one
+    faces = detect_faces(img_bgr)
+
+    if len(faces) == 0:
+        raise HTTPException(
+            status_code=422,
+            detail="No face detected in the image. Please upload a clear face photo.",
+        )
+
+    if len(faces) > 1:
+        raise HTTPException(
+            status_code=422,
+            detail=f"Multiple faces detected ({len(faces)}). Please upload a photo with only one face.",
+        )
+
+    face = faces[0]
+    embedding = face["embedding"]
+
+    # Save student record to database
     student_db_id = create_student(
         student_id_number=student_id_number,
         name=name,
         section_id=section_id,
     )
 
-    # Process each training image
+    # Save training image to disk
+    student_dir = DATASET_DIR / student_id_number
+    student_dir.mkdir(parents=True, exist_ok=True)
+    img_path = student_dir / "1.jpg"
+    img_path.write_bytes(image_bytes)
+
+    # Save embedding to database
+    save_embedding(
+        student_id=student_db_id,
+        embedding_blob=embedding_to_bytes(embedding),
+        source_image_path=str(img_path),
+    )
+
+    # Add to in-memory FAISS index for immediate searchability
+    faiss_manager.add_embedding(
+        section_id=section_id,
+        student_id=student_db_id,
+        name=name,
+        student_id_number=student_id_number,
+        embedding=embedding,
+    )
+
+    logger.info(f"Student registered: {name} ({student_id_number}) → section {section_id}")
+
+    return {
+        "id": student_db_id,
+        "name": name,
+        "status": "registered",
+    }
+
+
+# ── Student Registration (Multi-Image — Batch) ──────────────────────────
+
+@router.post("/register-batch")
+async def register_student_batch(
+    student_id_number: str = Form(...),
+    name: str = Form(...),
+    section_id: int = Form(...),
+    images: list[UploadFile] = File(..., description="1-5 face training images"),
+):
+    """
+    Register a new student with multiple training images (1–5).
+    Uses the highest-confidence face from each image.
+    """
+    if len(images) < 1 or len(images) > 5:
+        raise HTTPException(status_code=400, detail="Please provide 1 to 5 images")
+
+    section = get_section(section_id)
+    if not section:
+        raise HTTPException(status_code=404, detail=f"Section {section_id} not found")
+
+    existing = get_student_by_id_number(student_id_number)
+    if existing:
+        raise HTTPException(status_code=409, detail=f"Student {student_id_number} already registered")
+
+    student_db_id = create_student(
+        student_id_number=student_id_number,
+        name=name,
+        section_id=section_id,
+    )
+
     student_dir = DATASET_DIR / student_id_number
     student_dir.mkdir(parents=True, exist_ok=True)
     embeddings_saved = 0
@@ -104,38 +201,42 @@ async def register_student(
             logger.warning(f"Skipping invalid image {idx} for student {student_id_number}")
             continue
 
-        # Save training image to disk
         img_path = student_dir / f"{idx + 1}.jpg"
         img_path.write_bytes(image_bytes)
 
-        # Detect face and extract embedding
         faces = detect_faces(img_bgr)
         if not faces:
             logger.warning(f"No face detected in image {idx} for student {student_id_number}")
             continue
 
-        # Take the largest / highest-confidence face from the training image
         best_face = max(faces, key=lambda f: f["det_score"])
         embedding = best_face["embedding"]
 
-        # Save embedding to database
         save_embedding(
             student_id=student_db_id,
             embedding_blob=embedding_to_bytes(embedding),
             source_image_path=str(img_path),
+        )
+
+        faiss_manager.add_embedding(
+            section_id=section_id,
+            student_id=student_db_id,
+            name=name,
+            student_id_number=student_id_number,
+            embedding=embedding,
         )
         embeddings_saved += 1
 
     if embeddings_saved == 0:
         raise HTTPException(
             status_code=422,
-            detail="No faces could be detected in any of the provided images"
+            detail="No faces could be detected in any of the provided images",
         )
 
     return {
-        "message": f"Student {name} registered successfully",
-        "student_id": student_db_id,
-        "student_id_number": student_id_number,
+        "id": student_db_id,
+        "name": name,
+        "status": "registered",
         "embeddings_saved": embeddings_saved,
     }
 

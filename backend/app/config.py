@@ -10,11 +10,13 @@ DATABASE_PATH = BASE_DIR / "attendance.db"
 UPLOAD_DIR = BASE_DIR / "uploads"
 DATASET_DIR = BASE_DIR / "dataset" / "students"
 MODEL_DIR = BASE_DIR / "models"
+FAISS_INDEX_DIR = BASE_DIR / "faiss_indexes"
 
 # Ensure directories exist
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 DATASET_DIR.mkdir(parents=True, exist_ok=True)
 MODEL_DIR.mkdir(parents=True, exist_ok=True)
+FAISS_INDEX_DIR.mkdir(parents=True, exist_ok=True)
 
 # ── ML Settings ──────────────────────────────────────────────────────────
 MAX_IMAGE_SIZE = 1280                # Resize longest edge to this

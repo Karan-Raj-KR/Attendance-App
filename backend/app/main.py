@@ -13,6 +13,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.config import CORS_ORIGINS
 from app.database.database import init_db
 from app.ml.model_loader import model_loader
+from app.ml.faiss_index import faiss_manager
 from app.api.routes_detection import router as detection_router
 from app.api.routes_students import router as students_router
 from app.api.routes_attendance import router as attendance_router
@@ -39,6 +40,10 @@ async def lifespan(app: FastAPI):
     # Load ML models (RetinaFace + ArcFace)
     model_loader.load_models(ctx_id=-1, det_size=(640, 640))
     logger.info("✅ ML models loaded")
+
+    # Rebuild FAISS indexes from stored embeddings
+    faiss_manager.rebuild_all()
+    logger.info("✅ FAISS indexes ready")
 
     logger.info("🟢 Server ready")
     yield
