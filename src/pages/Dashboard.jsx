@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { GraduationCap, Bell } from 'lucide-react';
 import SectionCard from '../components/SectionCard';
 
 export default function Dashboard() {
@@ -40,16 +41,16 @@ export default function Dashboard() {
 
   return (
     <div className="w-full max-w-xl mx-auto p-4 pb-24">
-      {/* Top Header Row (Simulating the sticky header conceptually but positioned normally) */}
-      <header className="flex items-center justify-between mb-6 pt-2">
+      {/* Top Header Row */}
+      <header className="flex items-center justify-between mb-8 pt-2">
         <div className="flex items-center gap-3">
-          <div className="bg-primary/10 p-2 rounded-lg text-primary flex items-center justify-center">
-            <span className="material-symbols-outlined">school</span>
+          <div className="bg-primary/10 p-2.5 rounded-xl text-primary flex items-center justify-center">
+            <GraduationCap className="w-6 h-6" strokeWidth={2} />
           </div>
-          <h1 className="text-lg font-bold tracking-tight">Smart Attendance</h1>
+          <h1 className="text-xl font-bold tracking-tight">Smart Attendance</h1>
         </div>
-        <button className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors flex items-center justify-center">
-          <span className="material-symbols-outlined">notifications</span>
+        <button className="p-2.5 bg-white dark:bg-card-dark shadow-[0_4px_10px_rgba(0,0,0,0.03)] dark:shadow-none border border-slate-100 dark:border-slate-800 rounded-full hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors flex items-center justify-center active:scale-95">
+          <Bell className="w-5 h-5 text-slate-700 dark:text-slate-300" strokeWidth={2} />
         </button>
       </header>
 
@@ -61,21 +62,21 @@ export default function Dashboard() {
 
       {/* Quick Stats Row */}
       <div className="grid grid-cols-2 gap-4 mb-8">
-        <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm">
-          <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">Today's Classes</p>
-          <p className="text-2xl font-bold mt-1">4</p>
+        <div className="bg-white dark:bg-card-dark p-5 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)]">
+          <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest">Today's Classes</p>
+          <p className="text-3xl font-bold mt-2">4</p>
         </div>
-        <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm">
-          <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">Total Students</p>
-          <p className="text-2xl font-bold mt-1">182</p>
+        <div className="bg-white dark:bg-card-dark p-5 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)]">
+          <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest">Total Students</p>
+          <p className="text-3xl font-bold mt-2">182</p>
         </div>
       </div>
 
       {/* Active Sections List */}
       <section className="space-y-4">
-        <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center justify-between mb-3 px-1">
           <h3 className="text-lg font-bold">Your Active Sections</h3>
-          <span className="text-xs font-semibold px-2 py-1 bg-primary/10 text-primary rounded-full uppercase tracking-wide">
+          <span className="text-[10px] font-bold px-2.5 py-1 bg-primary/10 text-primary rounded-full uppercase tracking-widest">
             Live Now
           </span>
         </div>

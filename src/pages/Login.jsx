@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { Mail, Lock, LogIn, GraduationCap } from 'lucide-react';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -15,14 +16,14 @@ export default function Login() {
         {/* Header / Logo Section */}
         <div className="flex flex-col items-center mb-8 relative z-10">
           <div className="bg-primary/10 p-4 rounded-full mb-4">
-            <span className="material-symbols-outlined text-primary text-5xl">school</span>
+            <GraduationCap className="w-12 h-12 text-primary" strokeWidth={1.5} />
           </div>
           <h1 className="text-slate-900 dark:text-slate-100 text-3xl font-bold tracking-tight">Smart Attendance</h1>
-          <p className="text-slate-500 dark:text-slate-400 mt-2">Academic Portal Access</p>
+          <p className="text-slate-500 dark:text-slate-400 mt-2 font-medium">Academic Portal Access</p>
         </div>
 
         {/* Login Card */}
-        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-xl shadow-primary/5 p-8 border border-slate-100 dark:border-slate-700 relative z-10">
+        <div className="bg-white dark:bg-card-dark rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] p-8 relative z-10">
           <div className="mb-6">
             <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">Welcome Back</h2>
             <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Please enter your credentials to continue.</p>
@@ -31,16 +32,16 @@ export default function Login() {
           <form onSubmit={handleLogin} className="space-y-5">
             {/* Email Field */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Email Address</label>
+              <label htmlFor="email" className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Email Address</label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <span className="material-symbols-outlined text-slate-400 text-xl">mail</span>
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                  <Mail className="w-5 h-5 text-slate-400" strokeWidth={2} />
                 </div>
                 <input 
                   type="email" 
                   id="email" 
                   name="email" 
-                  className="block w-full pl-10 pr-3 py-2.5 bg-background-light dark:bg-background-dark border border-slate-200 dark:border-slate-700 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 transition-all" 
+                  className="block w-full pl-11 pr-3 py-3.5 bg-slate-50 dark:bg-slate-900 border-none focus:ring-2 focus:ring-primary/20 outline-none rounded-xl text-slate-900 dark:text-slate-100 placeholder-slate-400 transition-all font-medium" 
                   placeholder="name@university.edu" 
                   required 
                 />
@@ -50,18 +51,18 @@ export default function Login() {
             {/* Password Field */}
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label htmlFor="password" className="block text-sm font-medium text-slate-700 dark:text-slate-300">Password</label>
-                <a href="#" className="text-xs font-semibold text-primary hover:underline">Forgot password?</a>
+                <label htmlFor="password" className="block text-sm font-semibold text-slate-700 dark:text-slate-300">Password</label>
+                <a href="#" className="text-sm font-semibold text-primary hover:text-primary/80 transition-colors">Forgot password?</a>
               </div>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <span className="material-symbols-outlined text-slate-400 text-xl">lock</span>
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                  <Lock className="w-5 h-5 text-slate-400" strokeWidth={2} />
                 </div>
                 <input 
                   type="password" 
                   id="password" 
                   name="password" 
-                  className="block w-full pl-10 pr-3 py-2.5 bg-background-light dark:bg-background-dark border border-slate-200 dark:border-slate-700 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 transition-all" 
+                  className="block w-full pl-11 pr-3 py-3.5 bg-slate-50 dark:bg-slate-900 border-none focus:ring-2 focus:ring-primary/20 outline-none rounded-xl text-slate-900 dark:text-slate-100 placeholder-slate-400 transition-all font-medium" 
                   placeholder="••••••••" 
                   required 
                 />
@@ -69,30 +70,30 @@ export default function Login() {
             </div>
 
             {/* Remember Me */}
-            <div className="flex items-center mt-2">
+            <div className="flex items-center mt-3">
               <input 
                 type="checkbox" 
                 id="remember-me" 
                 name="remember-me" 
-                className="h-4 w-4 text-primary focus:ring-primary border-slate-300 rounded cursor-pointer" 
+                className="h-4.5 w-4.5 text-primary focus:ring-primary border-slate-300 rounded cursor-pointer transition-all" 
               />
-              <label htmlFor="remember-me" className="ml-2 block text-sm text-slate-600 dark:text-slate-400 cursor-pointer">Keep me signed in</label>
+              <label htmlFor="remember-me" className="ml-2.5 block text-sm font-medium text-slate-600 dark:text-slate-400 cursor-pointer">Keep me signed in</label>
             </div>
 
             {/* Sign In Button */}
             <button 
               type="submit" 
-              className="mt-6 w-full flex justify-center items-center py-3 px-4 rounded-lg bg-primary hover:bg-primary/90 text-white font-bold text-sm tracking-wide transition-colors shadow-lg shadow-primary/20 active:scale-[0.98]"
+              className="mt-8 w-full flex justify-center items-center py-4 px-4 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold text-base tracking-wide transition-all shadow-[0_8px_16px_rgba(37,99,235,0.2)] dark:shadow-[0_8px_16px_rgba(37,99,235,0.1)] active:scale-[0.98]"
             >
-              SIGN IN
-              <span className="material-symbols-outlined ml-2 text-lg">login</span>
+              Sign In
+              <LogIn className="ml-2 w-5 h-5" strokeWidth={2.5} />
             </button>
           </form>
 
           {/* Secondary Action */}
-          <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-700 text-center">
-            <p className="text-sm text-slate-500 dark:text-slate-400">
-              New instructor? <a href="#" className="text-primary font-semibold hover:underline">Request access</a>
+          <div className="mt-8 pt-6 border-t border-slate-100/50 dark:border-slate-800/50 text-center">
+            <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">
+              New instructor? <a href="#" className="text-primary font-bold hover:text-primary/80 transition-colors">Request access</a>
             </p>
           </div>
         </div>
