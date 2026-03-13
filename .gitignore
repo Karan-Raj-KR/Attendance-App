@@ -1,0 +1,26 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Node
+node_modules/
+dist/
+
+# Mac
+.DS_Store
+
+# uploads / data
+backend/uploads/
+backend/attendance.db
+
+# environment
+.env
+
+# Editor
+.vscode/
+
+# Build outputs
+build/
