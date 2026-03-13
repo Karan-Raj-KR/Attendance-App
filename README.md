@@ -1,28 +1,60 @@
 # Smart Attendance System
 
+A scalable AI-powered attendance system that detects and recognizes students from classroom images using face recognition and vector search. Built with a modern full-stack architecture designed for scalability across institutions.
+
+---
+
 ## Overview
-An AI-powered Smart Attendance System that leverages face detection and recognition to automate classroom attendance. Built with modern full-stack technologies, it provides a seamless experience for capturing a classroom image and generating accurate attendance records instantaneously.
+An AI-powered Smart Attendance System that leverages face detection and recognition to automate classroom attendance. The system automatically detects faces from a classroom photo, matches them against registered students using deep embeddings, and records attendance instantaneously.
 
 ## Features
-- **Real-Time Face Detection**: Accurately detects multiple faces in a classroom setting.
-- **High-Accuracy Face Recognition**: Matches detected faces against existing student records using vector similarity search.
+- **Real-Time Face Detection**: Accurately detects multiple faces in a classroom setting using RetinaFace.
+- **High-Accuracy Face Recognition**: Matches detected faces against existing student records using vector similarity search (ArcFace).
 - **Efficient Vector Search**: Utilizes FAISS for lightning-fast face embeddings matching.
+- **Section-Based Tracking**: Organize attendance by university sections or classes.
 - **Modern User Interface**: A responsive, mobile-friendly frontend built with React and Tailwind CSS.
 - **Robust Backend**: A fast and reliable REST API powered by FastAPI.
 
-## Architecture Explanation
+---
+
+## System Architecture
 The system operates based on a pipeline of machine learning components and web services:
-1. The **Frontend** captures or uploads a photo of the classroom, sending it to the backend.
-2. The **Backend** receives the image and utilizes the InsightFace framework to perform **Face Detection**.
-3. For each detected face, **Embeddings** are generated (a mathematical representation of facial features).
-4. The system then queries a pre-built **FAISS Vector Index** with these embeddings to find the closest match among registered students.
-5. High confidence matches are marked as Present, and the final attendance list is generated and returned to the frontend.
+1. **Frontend**: The React application captures or uploads a classroom photo.
+2. **Backend**: The FastAPI server receives the image and utilizes the InsightFace framework for **Face Detection**.
+3. **ML Pipeline**: 
+   - Each detected face is converted into permanent **Embeddings**.
+   - The system queries a **FAISS Vector Index** to find the closest match among registered students.
+4. **Attendance Generation**: High-confidence matches are recorded as `Present`. Sessions are saved securely in the database.
+
+---
 
 ## Tech Stack
-- **Frontend**: React, Vite, Tailwind CSS
-- **Backend**: FastAPI, Python (aiosqlite)
-- **Machine Learning**: InsightFace (RetinaFace, ArcFace), ONNXRuntime, OpenCV
-- **Vector Search**: FAISS (Facebook AI Similarity Search)
+
+### Frontend
+- **React** (v19)
+- **Vite**
+- **Tailwind CSS**
+- **Lucide React** (Icons)
+
+### Backend
+- **FastAPI**
+- **Python**
+- **Pydantic**
+- **aiosqlite** (Development Database)
+
+### Machine Learning
+- **InsightFace** (RetinaFace, ArcFace)
+- **FAISS** (Facebook AI Similarity Search)
+- **ONNXRuntime**
+- **OpenCV** & **NumPy**
+
+### Infrastructure (Planned)
+- **Docker** & **Docker Compose**
+- **PostgreSQL** (Production Migration)
+- **Redis** (Caching)
+- **Cloud Object Storage** (S3 for student datasets)
+
+---
 
 ## Project Structure
 ```text
@@ -30,82 +62,79 @@ Attendance-App
 │
 ├── frontend/             # React + Vite application
 │   ├── src/              # UI Components, Pages, and Layouts
-│   ├── public/           # Static assets
+│   ├── public/           # Static assets/manifests
 │   ├── package.json      # Node dependencies
 │   └── vite.config.js    # Vite configuration
 │
 ├── backend/              # FastAPI application & ML logic
-│   ├── app/              # API routes, database models, ML wrappers
-│   ├── models/           # Downloaded ONNX model weights
+│   ├── app/              # API routes, services, and ML wrappers
+│   ├── models/           # ONNX model weights
 │   ├── dataset/          # Stored student face data
 │   ├── faiss_indexes/    # Pre-built FAISS vector indexes
-│   ├── uploads/          # Temporary storage for uploaded images
+│   ├── uploads/          # Temporary storage for processing
 │   ├── requirements.txt  # Python dependencies
-│   └── main.py           # Application entry point
+│   └── main.py           # API entry point
 │
 ├── docs/                 # Documentation and architecture details
 ├── README.md             # This file
-├── LICENSE               # Open-source license
+├── LICENSE               # MIT License
 ├── .gitignore            # Git ignore definitions
-└── docker-compose.yml    # Deployment configuration (Future)
+└── docker-compose.yml    # Deployment configuration
 ```
+
+---
 
 ## Installation Instructions
 
-### Backend Setup
-1. Navigate to the backend directory:
-   ```bash
-   cd backend
-   ```
-2. Create and activate a virtual environment:
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows use `venv\Scripts\activate`
-   ```
-3. Install the dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-4. Run the FastAPI development server:
-   ```bash
-   python -m app.main
-   # or
-   uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
-   ```
+### Prerequisites
+- Python 3.9+
+- Node.js 18+
 
-### Frontend Setup
-1. Navigate to the frontend directory:
-   ```bash
-   cd frontend
-   ```
-2. Install npm dependencies:
-   ```bash
-   npm install
-   ```
-3. Start the Vite development server:
-   ```bash
-   npm run dev
-   ```
+### 1. Backend Setup
+```bash
+cd backend
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+pip install -r requirements.txt
+python -m app.main
+```
+The API will be available at `http://localhost:8000`. API Docs: `http://localhost:8000/docs`.
 
-## Usage Instructions
-1. Make sure both the backend and frontend servers are running.
-2. Open the frontend URL (usually `http://localhost:5173`) in your browser.
-3. Register students by uploading their clear photo and details.
-4. Navigate to the Capture page to upload an image of the current classroom.
-5. The system will detect faces, identify students, and generate an attendance summary for review.
+### 2. Frontend Setup
+```bash
+cd frontend
+npm install
+npm run dev
+```
+The application will be available at `http://localhost:5173`.
 
-## Roadmap
-- [ ] Containerize the application using Docker.
-- [ ] Implement robust authentication and authorization.
-- [ ] Integrate PostgreSQL and Redis for a production-ready database and caching layer.
-- [ ] Add real-time notifications for attendance processing.
-- [ ] Extensive unit test and integration test coverage.
+---
+
+## Usage
+1. **Register Students**: Upload clear photos and details to build the reference dataset.
+2. **Capture Attendance**: Upload a classroom photo via the Capture page.
+3. **Review**: The system detects faces and recognizes students. Review the matches and confirm.
+4. **Export**: Export attendance sessions for institutional records.
+
+---
+
+## Roadmap & Upcoming Features
+- [ ] **Multi-Tenant Architecture**: Support for multiple departments and universities.
+- [ ] **Admin Dashboard**: Comprehensive analytics for attendance trends.
+- [ ] **Mobile PWA Support**: Full offline-ready progressive web app.
+- [ ] **Authentication System**: Secure login for professors and admins.
+- [ ] **Cloud Storage**: Integration with AWS S3/Google Cloud Storage for images.
+- [ ] **GPU Acceleration**: Faster ML inference using CUDA.
+
+---
 
 ## Screenshots
-*(Screenshots references for future)*
-- [Attendance Screen](docs/screenshots/attendance.png)
-- [Face Detection Result](docs/screenshots/detection.png)
-- [Student Recognition](docs/screenshots/recognition.png)
+Refer to the [docs/screenshots](docs/screenshots/) folder for visual guides.
+- **Attendance Detection Screen**
+- **Student Recognition Results**
+- **Dashboard Overview**
+
+---
 
 ## License
 MIT License. See [LICENSE](LICENSE) for more information.
