@@ -1,0 +1,11 @@
+venv/
+dataset/
+uploads/
+faiss_indexes/
+*.db
+*.log
+__pycache__/
+*.pyc
+*.so
+*.dylib
+models/
