@@ -138,8 +138,8 @@ async def register_student(
         source_image_path=str(img_path),
     )
 
-    # Add to in-memory FAISS index for immediate searchability
-    faiss_manager.add_embedding(
+    # Add to in-memory FAISS index and persist to disk
+    faiss_manager.add_student_embedding(
         section_id=section_id,
         student_id=student_db_id,
         name=name,
@@ -153,6 +153,7 @@ async def register_student(
         "id": student_db_id,
         "name": name,
         "status": "registered",
+        "confidence": float(face["det_score"])
     }
 
 
@@ -188,7 +189,7 @@ async def register_student_batch(
 
     student_dir = DATASET_DIR / student_id_number
     student_dir.mkdir(parents=True, exist_ok=True)
-    embeddings_saved = 0
+    embeddings_saved: int = 0
 
     for idx, img_file in enumerate(images):
         image_bytes = await img_file.read()
@@ -218,14 +219,14 @@ async def register_student_batch(
             source_image_path=str(img_path),
         )
 
-        faiss_manager.add_embedding(
+        faiss_manager.add_student_embedding(
             section_id=section_id,
             student_id=student_db_id,
             name=name,
             student_id_number=student_id_number,
             embedding=embedding,
         )
-        embeddings_saved += 1
+        embeddings_saved = int(embeddings_saved) + 1
 
     if embeddings_saved == 0:
         raise HTTPException(

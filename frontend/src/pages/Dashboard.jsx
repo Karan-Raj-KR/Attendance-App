@@ -1,96 +1,154 @@
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { GraduationCap, Bell } from 'lucide-react';
-import SectionCard from '../components/SectionCard';
+import { Camera, UserPlus, History, GraduationCap, Users, CalendarCheck } from 'lucide-react';
+import { useSections } from '../hooks/useSections';
+import { useStudents } from '../hooks/useStudents';
+import { useAttendance } from '../hooks/useAttendance';
+import { useAppContext } from '../context/AppContext';
+import Card from '../components/common/Card';
+import Loader from '../components/common/Loader';
+import ErrorAlert from '../components/common/ErrorAlert';
+import { formatDate } from '../utils/helpers';
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const { sections, loading: secLoading } = useSections();
+  const { selectedSectionId, setSelectedSectionId } = useAppContext();
+  const { students, loading: stuLoading } = useStudents(selectedSectionId);
+  const { sessions, loadSessions, loading: sesLoading } = useAttendance();
 
-  const handleTakeAttendance = (sectionId) => {
-    navigate('/capture');
-  };
-
-  const sections = [
-    {
-      id: 1,
-      color: 'bg-primary',
-      icon: { name: 'terminal', bgClass: 'bg-gradient-to-br from-primary to-blue-400' },
-      name: 'Section 1',
-      title: 'Advanced Algorithms',
-      enrolled: 45,
-      time: '10:00 AM - 11:30 AM'
-    },
-    {
-      id: 4,
-      color: 'bg-indigo-500',
-      icon: { name: 'database', bgClass: 'bg-gradient-to-br from-indigo-500 to-purple-400' },
-      name: 'Section 4',
-      title: 'Database Systems',
-      enrolled: 38,
-      time: '01:00 PM - 02:30 PM'
-    },
-    {
-      id: 2,
-      color: 'bg-emerald-500',
-      icon: { name: 'developer_mode', bgClass: 'bg-gradient-to-br from-emerald-500 to-teal-400' },
-      name: 'Section 2',
-      title: 'Software Engineering',
-      enrolled: 52,
-      time: '03:00 PM - 04:30 PM'
+  useEffect(() => {
+    if (sections.length > 0 && !selectedSectionId) {
+      setSelectedSectionId(sections[0].id);
     }
+  }, [sections, selectedSectionId, setSelectedSectionId]);
+
+  useEffect(() => {
+    loadSessions(selectedSectionId);
+  }, [loadSessions, selectedSectionId]);
+
+  const latestSession = sessions.length > 0 ? sessions[0] : null;
+  const isLoading = secLoading || stuLoading || sesLoading;
+
+  if (isLoading && sections.length === 0) {
+    return <Loader fullPage text="Loading dashboard..." />;
+  }
+
+  const quickActions = [
+    {
+      icon: Camera,
+      label: 'Capture\nAttendance',
+      color: 'from-indigo-600 to-indigo-500',
+      shadow: 'shadow-indigo-500/30',
+      to: '/capture',
+    },
+    {
+      icon: UserPlus,
+      label: 'Register\nStudent',
+      color: 'from-emerald-600 to-emerald-500',
+      shadow: 'shadow-emerald-500/30',
+      to: '/register',
+    },
+    {
+      icon: History,
+      label: 'View\nHistory',
+      color: 'from-amber-600 to-amber-500',
+      shadow: 'shadow-amber-500/30',
+      to: '/history',
+    },
   ];
 
   return (
-    <div className="w-full max-w-xl mx-auto p-4 pb-24">
-      {/* Top Header Row */}
-      <header className="flex items-center justify-between mb-8 pt-2">
-        <div className="flex items-center gap-3">
-          <div className="bg-primary/10 p-2.5 rounded-xl text-primary flex items-center justify-center">
-            <GraduationCap className="w-6 h-6" strokeWidth={2} />
-          </div>
-          <h1 className="text-xl font-bold tracking-tight">Smart Attendance</h1>
-        </div>
-        <button className="p-2.5 bg-white dark:bg-card-dark shadow-[0_4px_10px_rgba(0,0,0,0.03)] dark:shadow-none border border-slate-100 dark:border-slate-800 rounded-full hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors flex items-center justify-center active:scale-95">
-          <Bell className="w-5 h-5 text-slate-700 dark:text-slate-300" strokeWidth={2} />
-        </button>
-      </header>
-
-      {/* Greeting Section */}
-      <section className="mb-8">
-        <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Welcome, Professor Miller</h2>
-        <p className="text-slate-500 dark:text-slate-400 mt-1">Ready for your morning sessions?</p>
-      </section>
-
-      {/* Quick Stats Row */}
-      <div className="grid grid-cols-2 gap-4 mb-8">
-        <div className="bg-white dark:bg-card-dark p-5 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)]">
-          <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest">Today's Classes</p>
-          <p className="text-3xl font-bold mt-2">4</p>
-        </div>
-        <div className="bg-white dark:bg-card-dark p-5 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)]">
-          <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest">Total Students</p>
-          <p className="text-3xl font-bold mt-2">182</p>
-        </div>
+    <div className="space-y-6 animate-in">
+      {/* Greeting */}
+      <div>
+        <h1 className="text-2xl font-bold text-white">Dashboard</h1>
+        <p className="text-slate-400 text-sm mt-1">Smart Attendance System</p>
       </div>
 
-      {/* Active Sections List */}
-      <section className="space-y-4">
-        <div className="flex items-center justify-between mb-3 px-1">
-          <h3 className="text-lg font-bold">Your Active Sections</h3>
-          <span className="text-[10px] font-bold px-2.5 py-1 bg-primary/10 text-primary rounded-full uppercase tracking-widest">
-            Live Now
-          </span>
-        </div>
-
-        <div className="gap-4 flex flex-col">
-          {sections.map(section => (
-            <SectionCard 
-              key={section.id} 
-              {...section} 
-              onAction={() => handleTakeAttendance(section.id)} 
-            />
+      {/* Section Selector */}
+      {sections.length > 0 && (
+        <select
+          value={selectedSectionId || ''}
+          onChange={(e) => setSelectedSectionId(Number(e.target.value))}
+          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-indigo-500/50 transition-all appearance-none"
+        >
+          {sections.map((s) => (
+            <option key={s.id} value={s.id} className="bg-slate-900">
+              {s.name} — {s.course_name}
+            </option>
           ))}
-        </div>
-      </section>
+        </select>
+      )}
+
+      {/* Quick Actions */}
+      <div className="grid grid-cols-3 gap-3">
+        {quickActions.map(({ icon: Icon, label, color, shadow, to }) => (
+          <button
+            key={to}
+            onClick={() => navigate(to)}
+            className={`
+              bg-gradient-to-br ${color} ${shadow}
+              rounded-2xl p-4 flex flex-col items-center gap-2.5
+              shadow-lg active:scale-[0.96] transition-all duration-200
+            `}
+          >
+            <Icon className="w-6 h-6 text-white" />
+            <span className="text-white text-xs font-medium text-center whitespace-pre-line leading-tight">
+              {label}
+            </span>
+          </button>
+        ))}
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-2 gap-3">
+        <Card>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-indigo-500/15 flex items-center justify-center">
+              <GraduationCap className="w-5 h-5 text-indigo-400" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-white">{sections.length}</p>
+              <p className="text-slate-400 text-xs">Sections</p>
+            </div>
+          </div>
+        </Card>
+        <Card>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-emerald-500/15 flex items-center justify-center">
+              <Users className="w-5 h-5 text-emerald-400" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-white">{students.length}</p>
+              <p className="text-slate-400 text-xs">Students</p>
+            </div>
+          </div>
+        </Card>
+      </div>
+
+      {/* Latest Session */}
+      {latestSession && (
+        <Card title="Latest Session" subtitle={formatDate(latestSession.date)}>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <CalendarCheck className="w-5 h-5 text-indigo-400" />
+              <div>
+                <p className="text-white text-sm font-medium">{latestSession.section}</p>
+                <p className="text-slate-400 text-xs">
+                  {latestSession.present} present · {latestSession.absent} absent
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => navigate(`/session/${latestSession.session_id}`)}
+              className="text-indigo-400 text-xs font-medium hover:text-indigo-300 transition-colors"
+            >
+              View →
+            </button>
+          </div>
+        </Card>
+      )}
     </div>
   );
 }

@@ -33,7 +33,7 @@ def match_faces(
     ).astype(np.float32)
 
     # Search FAISS index
-    search_results = faiss_manager.search(
+    search_results = faiss_manager.search_embedding(
         section_id=section_id,
         query_embeddings=query_embeddings,
         k=1,

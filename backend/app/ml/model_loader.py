@@ -1,6 +1,6 @@
 """
-Singleton model loader for RetinaFace and ArcFace.
-Models are loaded once at application startup and kept in memory.
+Singleton model loader for InsightFace (RetinaFace and ArcFace).
+Models are loaded once at application startup and kept in memory to prevent reloading overhead per request.
 """
 
 import logging
@@ -30,24 +30,27 @@ class ModelLoader:
         det_size: detection input size (width, height)
         """
         if self._face_app is not None:
-            logger.info("Models already loaded, skipping.")
+            logger.info("InsightFace models already loaded, skipping initialization.")
             return
 
-        logger.info("Loading InsightFace models (RetinaFace + ArcFace)...")
-        self._face_app = FaceAnalysis(
-            name="buffalo_l",                # Includes both detection + recognition
+        logger.info("Loading InsightFace models (RetinaFace + ArcFace)... This may take a moment.")
+        # 'buffalo_l' includes both robust face detection and high-accuracy recognition embeddings
+        app_instance = FaceAnalysis(
+            name="buffalo_l",                
             providers=["CPUExecutionProvider"]
         )
-        if self._face_app is not None:
-            self._face_app.prepare(ctx_id=ctx_id, det_size=det_size)
-        logger.info("Models loaded successfully.")
+        self._face_app = app_instance
+        # Prepare the model with the specified context and detection size
+        if app_instance is not None:
+            app_instance.prepare(ctx_id=ctx_id, det_size=det_size)
+        logger.info("InsightFace models loaded successfully into memory.")
 
     @property
     def face_app(self) -> FaceAnalysis:
         if self._face_app is None:
-            raise RuntimeError("Models not loaded. Call load_models() first.")
+            raise RuntimeError("Models not loaded. Call load_models() during FastAPI startup BEFORE processing requests.")
         return self._face_app
 
 
-# Module-level singleton
+# Module-level singleton instance for the entire application lifecycle
 model_loader = ModelLoader()

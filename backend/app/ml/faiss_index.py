@@ -2,16 +2,19 @@
 FAISS-based vector index for fast student embedding search.
 
 Uses IndexFlatIP (inner product) on L2-normalized embeddings,
-which is equivalent to cosine similarity. One index per section.
+which is equivalent to cosine similarity. 
+Persists `.index` and `.json` metadata to disk per section.
 """
 
 import logging
+import json
+from pathlib import Path
 from typing import Optional
 
 import faiss
 import numpy as np
 
-from app.config import EMBEDDING_DIM
+from app.config import EMBEDDING_DIM, FAISS_INDEX_DIR
 from app.database.queries import get_embeddings_by_section, get_sections
 from app.utils.embedding_utils import bytes_to_embedding, normalize_embedding
 
@@ -19,18 +22,46 @@ logger = logging.getLogger(__name__)
 
 
 class SectionIndex:
-    """FAISS index + metadata for a single section."""
+    """FAISS index + metadata for a single section with disk persistence."""
 
     def __init__(self, section_id: int):
         self.section_id = section_id
+        self.index_path = FAISS_INDEX_DIR / f"section_{section_id}.index"
+        self.meta_path = FAISS_INDEX_DIR / f"section_{section_id}_meta.json"
+        
         self.index: faiss.IndexFlatIP = faiss.IndexFlatIP(EMBEDDING_DIM)
-        self.id_map: list[int] = []          # row → student_id
-        self.name_map: dict[int, str] = {}   # student_id → name
-        self.idnum_map: dict[int, str] = {}  # student_id → student_id_number
+        # We store metadata parallel to the FAISS index (row N = self.metadata[N])
+        self.metadata: list[dict] = []
 
     @property
     def size(self) -> int:
         return self.index.ntotal
+
+    def save(self):
+        """Save index and metadata to disk."""
+        faiss.write_index(self.index, str(self.index_path))
+        with open(self.meta_path, "w") as f:
+            json.dump(self.metadata, f)
+
+    def load(self) -> bool:
+        """Load index from disk. Returns True if successful."""
+        if not self.index_path.exists() or not self.meta_path.exists():
+            return False
+
+        try:
+            self.index = faiss.read_index(str(self.index_path))
+            with open(self.meta_path, "r") as f:
+                self.metadata = json.load(f)
+            
+            # Sanity check
+            if self.index.ntotal != len(self.metadata):
+                logger.warning(f"Index mismatch for section {self.section_id}. Rebuilding...")
+                return False
+                
+            return True
+        except Exception as e:
+            logger.error(f"Failed to load index for section {self.section_id}: {e}")
+            return False
 
     def add(
         self,
@@ -40,11 +71,14 @@ class SectionIndex:
         embedding: np.ndarray,
     ):
         """Add a single L2-normalized embedding to the index."""
+        # Ensure embedding shape (1, 512) and type float32
         vec = normalize_embedding(embedding).astype(np.float32).reshape(1, -1)
         self.index.add(vec)
-        self.id_map.append(student_id)
-        self.name_map[student_id] = name
-        self.idnum_map[student_id] = student_id_number
+        self.metadata.append({
+            "student_id": student_id,
+            "name": name,
+            "student_id_number": student_id_number,
+        })
 
     def search(
         self,
@@ -82,7 +116,7 @@ class SectionIndex:
             idx = int(indices[i][0])
             score = float(distances[i][0])
 
-            if idx < 0 or idx >= len(self.id_map):
+            if idx < 0 or idx >= len(self.metadata):
                 results.append({
                     "student_id": None,
                     "student_id_number": None,
@@ -90,11 +124,11 @@ class SectionIndex:
                     "confidence": 0.0,
                 })
             else:
-                sid = self.id_map[idx]
+                meta = self.metadata[idx]
                 results.append({
-                    "student_id": sid,
-                    "student_id_number": self.idnum_map.get(sid),
-                    "name": self.name_map.get(sid),
+                    "student_id": meta["student_id"],
+                    "student_id_number": meta.get("student_id_number"),
+                    "name": meta.get("name"),
                     "confidence": score,
                 })
 
@@ -103,33 +137,48 @@ class SectionIndex:
 
 class FaissIndexManager:
     """
-    Manages per-section FAISS indexes.
-
-    Singleton — import `faiss_manager` from this module.
+    Manages per-section FAISS indexes and disk persistence.
+    Provides requested functions: create_index, add_student_embedding, search_embedding, rebuild_index.
     """
 
     _instance: Optional["FaissIndexManager"] = None
+    _indexes: dict[int, SectionIndex]
 
     def __new__(cls):
         if cls._instance is None:
             cls._instance = super().__new__(cls)
-            cls._instance._indexes: dict[int, SectionIndex] = {}
+            cls._instance._indexes = {}
         return cls._instance
 
-    # ── Build / Rebuild ──────────────────────────────────────────────────
-
-    def rebuild_section(self, section_id: int) -> SectionIndex:
+    def create_index(self, section_id: int) -> SectionIndex:
         """
-        Rebuild the FAISS index for a single section from the database.
+        Load an existing FAISS index from disk if available, otherwise return an empty index.
+        """
+        if section_id in self._indexes:
+            return self._indexes[section_id]
+            
+        section_idx = SectionIndex(section_id)
+        if section_idx.load():
+            logger.info(f"Loaded FAISS index for section {section_id} from disk (size={section_idx.size})")
+        else:
+            logger.info(f"Initialized new FAISS index for section {section_id}")
+            
+        self._indexes[section_id] = section_idx
+        return section_idx
 
-        Groups multiple embeddings per student by averaging them
-        (gallery representation) before inserting into the index.
+    def rebuild_index(self, section_id: int) -> SectionIndex:
+        """
+        Force rebuild the FAISS index for a single section from the database and save to disk.
+        Groups multiple embeddings per student by averaging them.
         """
         stored = get_embeddings_by_section(section_id)
+        
+        # Replace completely fresh to discard old items
         section_idx = SectionIndex(section_id)
 
         if not stored:
-            logger.info(f"Section {section_id}: no embeddings, empty index created")
+            logger.info(f"Section {section_id}: no embeddings, saving empty index.")
+            section_idx.save()
             self._indexes[section_id] = section_idx
             return section_idx
 
@@ -159,31 +208,26 @@ class FaissIndexManager:
                 embedding=avg_emb,
             )
 
+        # Persist to disk
+        section_idx.save()
         self._indexes[section_id] = section_idx
+        
         logger.info(
-            f"Section {section_id}: FAISS index rebuilt with "
+            f"Section {section_id}: FAISS index rebuilt and saved to disk with "
             f"{section_idx.size} students"
         )
         return section_idx
 
     def rebuild_all(self):
-        """Rebuild FAISS indexes for every section that has students."""
+        """Rebuild and save FAISS indexes for every section."""
         sections = get_sections()
         total = 0
         for sec in sections:
-            idx = self.rebuild_section(sec["id"])
+            idx = self.rebuild_index(sec["id"])
             total += idx.size
-        logger.info(f"✅ FAISS indexes rebuilt: {len(sections)} sections, {total} total vectors")
+        logger.info(f"✅ FAISS indexes rebuilt and persisted: {len(sections)} sections, {total} vectors")
 
-    # ── Runtime Operations ───────────────────────────────────────────────
-
-    def get_index(self, section_id: int) -> SectionIndex:
-        """Get (or lazily build) the index for a section."""
-        if section_id not in self._indexes:
-            self.rebuild_section(section_id)
-        return self._indexes[section_id]
-
-    def add_embedding(
+    def add_student_embedding(
         self,
         section_id: int,
         student_id: int,
@@ -192,31 +236,29 @@ class FaissIndexManager:
         embedding: np.ndarray,
     ):
         """
-        Add a new embedding to the in-memory FAISS index.
-
-        NOTE: For simplicity this appends the raw embedding rather than
-        re-averaging. Call rebuild_section() for a full refresh.
+        Add a new student embedding to the index and persist to disk.
         """
-        idx = self.get_index(section_id)
+        idx = self.create_index(section_id)
         idx.add(
             student_id=student_id,
             name=name,
             student_id_number=student_id_number,
             embedding=embedding,
         )
+        idx.save()
         logger.info(
             f"Added embedding for student {student_id} ({name}) "
             f"to section {section_id} FAISS index (size={idx.size})"
         )
 
-    def search(
+    def search_embedding(
         self,
         section_id: int,
         query_embeddings: np.ndarray,
         k: int = 1,
     ) -> list[dict]:
-        """Search the FAISS index for a given section."""
-        idx = self.get_index(section_id)
+        """Search the FAISS index for nearest neighbors."""
+        idx = self.create_index(section_id)
         return idx.search(query_embeddings, k=k)
 
 

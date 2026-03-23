@@ -1,0 +1,51 @@
+INFO:     Will watch for changes in these directories: ['/Users/karanrajkr/Projects/Attendance App/backend']
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [22380] using StatReload
+/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/albumentations/check_version.py:147: UserWarning: Error fetching version info <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1081)>
+  data = fetch_version_info()
+INFO:     Started server process [22384]
+INFO:     Waiting for application startup.
+10:16:16 │ INFO    │ app.main │ 🚀 Starting Smart Attendance Backend...
+10:16:16 │ INFO    │ app.main │ ✅ Database initialized
+10:16:16 │ INFO    │ app.ml.model_loader │ Loading InsightFace models (RetinaFace + ArcFace)... This may take a moment.
+10:16:17 │ INFO    │ app.ml.model_loader │ InsightFace models loaded successfully into memory.
+10:16:17 │ INFO    │ app.main │ ✅ ML models loaded
+10:16:17 │ INFO    │ app.ml.faiss_index │ Section 2: FAISS index rebuilt and saved to disk with 1 students
+10:16:17 │ INFO    │ app.ml.faiss_index │ Section 1: no embeddings, saving empty index.
+10:16:17 │ INFO    │ app.ml.faiss_index │ ✅ FAISS indexes rebuilt and persisted: 2 sections, 1 vectors
+10:16:17 │ INFO    │ app.main │ ✅ FAISS indexes ready
+10:16:17 │ INFO    │ app.main │ 🟢 Server ready
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'app/api/routes_students.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+10:21:15 │ INFO    │ app.main │ 🔴 Shutting down...
+INFO:     Application shutdown complete.
+INFO:     Finished server process [22384]
+Fatal Python error: init_sys_streams: can't initialize sys standard streams
+Python runtime state: core initialized
+OSError: [Errno 9] Bad file descriptor
+
+Current thread 0x000000020be56c40 (most recent call first):
+  <no Python frame>
+WARNING:  StatReload detected changes in 'app/ml/faiss_index.py'. Reloading...
+Fatal Python error: init_sys_streams: can't initialize sys standard streams
+Python runtime state: core initialized
+OSError: [Errno 9] Bad file descriptor
+
+Current thread 0x000000020be56c40 (most recent call first):
+  <no Python frame>
+WARNING:  StatReload detected changes in 'app/ml/model_loader.py'. Reloading...
+Fatal Python error: init_sys_streams: can't initialize sys standard streams
+Python runtime state: core initialized
+OSError: [Errno 9] Bad file descriptor
+
+Current thread 0x000000020be56c40 (most recent call first):
+  <no Python frame>
+WARNING:  StatReload detected changes in 'app/api/routes_students.py'. Reloading...
+Fatal Python error: init_sys_streams: can't initialize sys standard streams
+Python runtime state: core initialized
+OSError: [Errno 9] Bad file descriptor
+
+Current thread 0x000000020be56c40 (most recent call first):
+  <no Python frame>
