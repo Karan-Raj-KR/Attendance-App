@@ -15,9 +15,14 @@ dist/
 # uploads / data
 backend/uploads/
 backend/attendance.db
+backend/faiss_indexes/
+backend/dataset/
+backend/server.log
+backend/uvicorn.log
 
 # environment
 .env
+.env.production
 
 # Editor
 .vscode/

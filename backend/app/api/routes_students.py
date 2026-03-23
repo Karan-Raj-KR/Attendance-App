@@ -8,7 +8,6 @@ from pathlib import Path
 from fastapi import APIRouter, File, UploadFile, Form, HTTPException, Query
 from typing import Optional
 
-from app.config import DATASET_DIR
 from app.models.student import (
     StudentRegisterRequest,
     StudentResponse,
@@ -27,6 +26,7 @@ from app.database.queries import (
 from app.services.face_detection import detect_faces
 from app.utils.image_utils import read_image_from_bytes
 from app.utils.embedding_utils import embedding_to_bytes
+from app.utils.storage import upload_image
 from app.ml.faiss_index import faiss_manager
 
 logger = logging.getLogger(__name__)
@@ -125,17 +125,15 @@ async def register_student(
         section_id=section_id,
     )
 
-    # Save training image to disk
-    student_dir = DATASET_DIR / student_id_number
-    student_dir.mkdir(parents=True, exist_ok=True)
-    img_path = student_dir / "1.jpg"
-    img_path.write_bytes(image_bytes)
+    # Save training image (R2 in production, local disk in dev)
+    storage_key = f"{student_id_number}/1.jpg"
+    img_path = upload_image(storage_key, image_bytes)
 
     # Save embedding to database
     save_embedding(
         student_id=student_db_id,
         embedding_blob=embedding_to_bytes(embedding),
-        source_image_path=str(img_path),
+        source_image_path=img_path,
     )
 
     # Add to in-memory FAISS index and persist to disk
@@ -187,8 +185,6 @@ async def register_student_batch(
         section_id=section_id,
     )
 
-    student_dir = DATASET_DIR / student_id_number
-    student_dir.mkdir(parents=True, exist_ok=True)
     embeddings_saved: int = 0
 
     for idx, img_file in enumerate(images):
@@ -202,8 +198,8 @@ async def register_student_batch(
             logger.warning(f"Skipping invalid image {idx} for student {student_id_number}")
             continue
 
-        img_path = student_dir / f"{idx + 1}.jpg"
-        img_path.write_bytes(image_bytes)
+        storage_key = f"{student_id_number}/{idx + 1}.jpg"
+        img_path = upload_image(storage_key, image_bytes)
 
         faces = detect_faces(img_bgr)
         if not faces:
@@ -216,7 +212,7 @@ async def register_student_batch(
         save_embedding(
             student_id=student_db_id,
             embedding_blob=embedding_to_bytes(embedding),
-            source_image_path=str(img_path),
+            source_image_path=img_path,
         )
 
         faiss_manager.add_student_embedding(
@@ -226,7 +222,7 @@ async def register_student_batch(
             student_id_number=student_id_number,
             embedding=embedding,
         )
-        embeddings_saved = int(embeddings_saved) + 1
+        embeddings_saved += 1
 
     if embeddings_saved == 0:
         raise HTTPException(

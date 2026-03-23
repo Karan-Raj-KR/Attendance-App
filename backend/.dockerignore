@@ -1,0 +1,14 @@
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.db
+uploads/
+dataset/
+faiss_indexes/
+models/
+server.log
+uvicorn.log
+.env
+pyrightconfig.json
