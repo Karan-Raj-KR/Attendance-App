@@ -9,7 +9,7 @@ psycopg2-binary==2.9.9
 
 # ML / Computer Vision
 insightface==0.7.3
-onnxruntime==1.24.3
+onnxruntime==1.23.2
 opencv-python-headless
 numpy
 Pillow
